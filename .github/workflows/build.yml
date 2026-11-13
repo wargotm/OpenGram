@@ -1,0 +1,32 @@
+name: Build APK
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android/sdk/ndk/2[0-6].* /opt/hostedtoolcache/CodeQL || true
+          df -h /
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Apply OpenGram overlay
+        run: |
+          if [ -f opengram_overlay.zip ]; then unzip -o opengram_overlay.zip; fi
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Android SDK
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platforms;android-36" "ndk;27.2.12479018" "build-tools;36.0.0" "cmake;3.22.1"
+      - uses: gradle/actions/setup-gradle@v4
+      - run: chmod +x gradlew && ./gradlew :TMessagesProj_App:assembleAfatDebug --no-daemon --stacktrace
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: apk
+          path: "**/build/outputs/apk/**/*.apk"
