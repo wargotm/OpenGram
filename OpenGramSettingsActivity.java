@@ -1,5 +1,7 @@
 package org.telegram.ui;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -41,6 +43,18 @@ public class OpenGramSettingsActivity extends OpenGramPage {
         b.setPadding(AndroidUtilities.dp(22), 0, AndroidUtilities.dp(22), 0);
         b.setOnClickListener(v -> presentFragment(new VerifiedPage()));
         box.addView(b, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 56));
+
+        TextView developer = text(context, "Разработчик: @opengl41", 12, Theme.key_windowBackgroundWhiteBlueText);
+        developer.setPadding(AndroidUtilities.dp(22), AndroidUtilities.dp(18), AndroidUtilities.dp(22), 0);
+        developer.setGravity(Gravity.CENTER_VERTICAL);
+        developer.setOnClickListener(v -> {
+            try {
+                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/opengl41")));
+            } catch (Exception ignored) {
+            }
+        });
+        box.addView(developer, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 42));
+
         fragmentView = box;
         return box;
     }
