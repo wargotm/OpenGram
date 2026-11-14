@@ -11,6 +11,9 @@ jobs:
         with:
           submodules: recursive
       - name: Apply OpenGram changes
+        env:
+          TG_API_ID: ${{ secrets.TG_API_ID }}
+          TG_API_HASH: ${{ secrets.TG_API_HASH }}
         run: |
           cp OpenGramSettingsActivity.java TMessagesProj/src/main/java/org/telegram/ui/
           python3 opengram_patch.py
@@ -20,19 +23,10 @@ jobs:
           java-version: 21
       - name: Android SDK
         run: |
-          SDKM=$(ls -d /usr/local/lib/android/sdk/cmdline-tools/*/bin/sdkmanager | head -1)
-          yes | $SDKM --licenses > /dev/null || true
-          $SDKM "platforms;android-36" "ndk;27.2.12479018" "build-tools;36.0.0" "cmake;3.22.1"
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platforms;android-36" "ndk;27.2.12479018" "build-tools;36.0.0" "cmake;3.22.1"
       - uses: gradle/actions/setup-gradle@v4
-      - name: Build
-        run: |
-          chmod +x gradlew
-          set -o pipefail
-          ./gradlew :TMessagesProj_App:assembleAfatDebug --no-daemon 2>&1 | tee build.log
-      - name: Errors summary
-        if: failure()
-        run: |
-          grep -n -E "error:|What went wrong|Execution failed|FAILED|cannot find symbol" -A4 build.log | head -60
+      - run: chmod +x gradlew && ./gradlew :TMessagesProj_App:assembleAfatDebug --no-daemon --stacktrace
       - uses: actions/upload-artifact@v4
         if: always()
         with:
