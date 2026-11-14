@@ -1,5 +1,4 @@
-
-    import re,os,glob
+import re,os,glob
 B='TMessagesProj/src/main/'
 J=B+'java/org/telegram/'
 rd=lambda p:open(p,encoding='utf8').read()
