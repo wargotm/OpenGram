@@ -1,4 +1,5 @@
-import re,os,glob
+
+    import re,os,glob
 B='TMessagesProj/src/main/'
 J=B+'java/org/telegram/'
 rd=lambda p:open(p,encoding='utf8').read()
@@ -32,4 +33,12 @@ def patch(p,old,new):
     wr(p,s.replace(old,new,1))
 patch(J+'messenger/MessagesController.java','        TLRPC.User oldUser = users.get(user.id);\n        if (oldUser == user && !force)','        if (user.id == getUserConfig().getClientUserId() && getGlobalMainSettings().getBoolean("opengram_major_badge_" + currentAccount, false)) user.verified = true;\n        TLRPC.User oldUser = users.get(user.id);\n        if (oldUser == user && !force)')
 patch(J+'messenger/UserConfig.java','            clientUserId = user.id;\n','            clientUserId = user.id;\n            if (MessagesController.getGlobalMainSettings().getBoolean("opengram_major_badge_" + currentAccount, false)) user.verified = true;\n')
+
+aid=os.environ.get('TG_API_ID','').strip(); ah=os.environ.get('TG_API_HASH','').strip()
+if aid.isdigit() and re.fullmatch(r'[0-9a-f]{32}',ah):
+    p=J+'messenger/BuildVars.java'; s=rd(p)
+    s=re.sub(r'public static int APP_ID = \d+;','public static int APP_ID = %s;'%aid,s)
+    s=re.sub(r'public static String APP_HASH = "[0-9a-f]+";','public static String APP_HASH = "%s";'%ah,s)
+    wr(p,s); print('API keys set')
+else: print('WARNING: TG_API_ID/TG_API_HASH secrets missing, official keys left')
 print('OK')
