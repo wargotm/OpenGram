@@ -17,7 +17,7 @@ import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
-public class OpenGramSettingsActivity extends BaseFragment {
+public class OpenGramSettingsActivity extends OpenGramPage {
     static TextView text(Context c, String s, int size, int color) {
         TextView t = new TextView(c);
         t.setText(s);
@@ -25,24 +25,9 @@ public class OpenGramSettingsActivity extends BaseFragment {
         t.setTextColor(Theme.getColor(color));
         return t;
     }
-    static void bar(BaseFragment f, String title) {
-        f.setHasOwnBackground(true);
-        f.simpleActionBar.setBackButtonImage(R.drawable.ic_ab_back);
-        f.simpleActionBar.setTitle(title);
-        f.simpleActionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
-            @Override
-            public void onItemClick(int id) {
-                if (id == -1) f.finishFragment();
-            }
-        });
-    }
-    @Override
-    protected boolean useSimpleActionBar() {
-        return true;
-    }
     @Override
     public View createView(Context context) {
-        bar(this, LocaleController.getString(R.string.OpenGramSettings));
+        bar(LocaleController.getString(R.string.OpenGramSettings));
         LinearLayout box = new LinearLayout(context);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(0, AndroidUtilities.dp(12), 0, 0);
@@ -59,14 +44,10 @@ public class OpenGramSettingsActivity extends BaseFragment {
         fragmentView = box;
         return box;
     }
-    public static class GlassPage extends BaseFragment {
-        @Override
-        protected boolean useSimpleActionBar() {
-            return true;
-        }
+    public static class GlassPage extends OpenGramPage {
         @Override
         public View createView(Context context) {
-            bar(this, LocaleController.getString(R.string.OpenGramGlassSettings));
+            bar(LocaleController.getString(R.string.OpenGramGlassSettings));
             LinearLayout box = new LinearLayout(context);
             box.setOrientation(LinearLayout.VERTICAL);
             box.setPadding(AndroidUtilities.dp(22), AndroidUtilities.dp(28), AndroidUtilities.dp(22), 0);
@@ -93,14 +74,10 @@ public class OpenGramSettingsActivity extends BaseFragment {
             return box;
         }
     }
-    public static class VerifiedPage extends BaseFragment {
-        @Override
-        protected boolean useSimpleActionBar() {
-            return true;
-        }
+    public static class VerifiedPage extends OpenGramPage {
         @Override
         public View createView(Context context) {
-            bar(this, LocaleController.getString(R.string.OpenGramVerifiedSettings));
+            bar(LocaleController.getString(R.string.OpenGramVerifiedSettings));
             String key = "opengram_major_badge_" + currentAccount;
             LinearLayout box = new LinearLayout(context);
             box.setOrientation(LinearLayout.VERTICAL);
@@ -127,5 +104,22 @@ public class OpenGramSettingsActivity extends BaseFragment {
             fragmentView = box;
             return box;
         }
+    }
+}
+abstract class OpenGramPage extends BaseFragment {
+    @Override
+    protected boolean useSimpleActionBar() {
+        return true;
+    }
+    void bar(String title) {
+        setHasOwnBackground(true);
+        simpleActionBar.setBackButtonImage(R.drawable.ic_ab_back);
+        simpleActionBar.setTitle(title);
+        simpleActionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+            @Override
+            public void onItemClick(int id) {
+                if (id == -1) finishFragment();
+            }
+        });
     }
 }
